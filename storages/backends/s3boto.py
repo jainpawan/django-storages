@@ -35,6 +35,7 @@ QUERYSTRING_AUTH = getattr(settings, 'AWS_QUERYSTRING_AUTH', True)
 QUERYSTRING_EXPIRE = getattr(settings, 'AWS_QUERYSTRING_EXPIRE', 3600)
 REDUCED_REDUNDANCY = getattr(settings, 'AWS_REDUCED_REDUNDANCY', False)
 LOCATION = getattr(settings, 'AWS_LOCATION', '')
+S3_HOST = getattr(settings, 'AWS_S3_HOST', 's3.amazonaws.com')
 CUSTOM_DOMAIN = getattr(settings, 'AWS_S3_CUSTOM_DOMAIN', None)
 CALLING_FORMAT = getattr(settings, 'AWS_S3_CALLING_FORMAT',
                          SubdomainCallingFormat())
@@ -160,7 +161,7 @@ class S3BotoStorage(Storage):
             access_key, secret_key = self._get_access_keys()
 
         self.connection = S3Connection(access_key, secret_key,
-            calling_format=calling_format)
+            calling_format=calling_format, host=S3_HOST)
         self._entries = {}
 
     @property
