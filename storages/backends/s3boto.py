@@ -28,6 +28,11 @@ ACCESS_KEY_NAME = getattr(settings, 'AWS_S3_ACCESS_KEY_ID', getattr(settings, 'A
 SECRET_KEY_NAME = getattr(settings, 'AWS_S3_SECRET_ACCESS_KEY', getattr(settings, 'AWS_SECRET_ACCESS_KEY', None))
 HEADERS = getattr(settings, 'AWS_HEADERS', {})
 STORAGE_BUCKET_NAME = getattr(settings, 'AWS_STORAGE_BUCKET_NAME', None)
+# adding new settings
+BUCKET_REGION_MAP = getattr(settings, 'AWS_BUCKET_REGION_MAP', {})
+AWS_S3_HOST_FUNC = getattr(settings, 'AWS_S3_HOST_FUNC', 's3.{region}.amazonaws.com')
+AWS_S3_REGION_NAME = getattr(settings, 'AWS_S3_REGION_NAME', 'ap-south-1')
+#____________________________________
 AUTO_CREATE_BUCKET = getattr(settings, 'AWS_AUTO_CREATE_BUCKET', False)
 DEFAULT_ACL = getattr(settings, 'AWS_DEFAULT_ACL', 'public-read')
 BUCKET_ACL = getattr(settings, 'AWS_BUCKET_ACL', DEFAULT_ACL)
@@ -159,7 +164,12 @@ class S3BotoStorage(Storage):
 
         if not access_key and not secret_key:
             access_key, secret_key = self._get_access_keys()
-
+        S3_HOST=AWS_S3_HOST_FUNC.format(
+            # get the region by bucket else put default for the environment
+            region=BUCKET_REGION_MAP.get(
+                bucket, AWS_S3_REGION_NAME
+            )
+        )
         self.connection = S3Connection(access_key, secret_key,
             calling_format=calling_format, host=S3_HOST)
         self._entries = {}
